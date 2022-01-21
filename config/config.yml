@@ -1,0 +1,8 @@
+app:
+  name: Go Demo
+  debug: true
+  env: local
+
+mysql:
+  default:
+    dns: "root:root@tcp(127.0.0.1:3306)/hub?charset=utf8mb4&parseTime=true&loc=Local"
