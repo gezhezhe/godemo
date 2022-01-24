@@ -1,24 +1,41 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 	"time"
+
+	"addnewer.com/godemo/internel/router"
+	"addnewer.com/godemo/pkg/config"
 )
 
 type AppServer struct {
-	conf   *Config
-	router *http.Handler
-	srv    *http.Server
+	conf *Config
+	srv  *http.Server
 }
 
-func NewAppServer(c *Config, r *http.Handler) *AppServer {
-	app := &AppServer{
-		conf:   c,
-		router: r,
+func NewAppServer(file string) *AppServer {
+	conf, err := config.New(file)
+	if err != nil {
+		panic("配置文件初始化错误: " + err.Error())
 	}
 
-	app.initHttpServer()
+	appConf := NewConfig(conf)
+
+	r := router.NewGinEngine()
+	router.RegisterApiRouter(r)
+
+	srv := &http.Server{
+		Addr:         ":8081",
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+		Handler:      r,
+	}
+
+	app := &AppServer{
+		conf: appConf,
+		srv:  srv,
+	}
 
 	return app
 }
@@ -29,18 +46,6 @@ func (a *AppServer) Run() {
 	}
 }
 
-func (a *AppServer) SetHttpServer(s *http.Server) {
-	a.srv = s
-}
-
-func (a *AppServer) initHttpServer() {
-	a.srv = &http.Server{
-		Addr:         ":8081",
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  60 * time.Second,
-		Handler:      *a.router,
-	}
-
-	fmt.Println("app name: " + a.conf.Name)
-}
+// func (a *AppServer) SetHttpServer(s *http.Server) {
+// 	a.srv = s
+// }

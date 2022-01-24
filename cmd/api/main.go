@@ -14,6 +14,12 @@ import (
 func main() {
 	fmt.Println("Hello World")
 	file := "/home/zhe/workspace/go/src/godemo/config/config.yml"
+	app.NewAppServer(file).Run()
+}
+
+func main1() {
+	fmt.Println("Hello World")
+	file := "/home/zhe/workspace/go/src/godemo/config/config.yml"
 	conf, err := config.New(file)
 	if err != nil {
 		panic("配置文件初始化错误: " + err.Error())
